@@ -1,8 +1,9 @@
 import {Card} from "antd";
+import "./L3t-Card.css"
 
 export function L3tCard () {
     return (
-        <Card id="l3t-card" title="aa" style={{width: "260px", position: "absolute", top:0, left: 0}}>
+        <Card id="l3t-card" title="aa" >
             <p>this is a word</p>
         </Card>
     )
@@ -12,6 +13,10 @@ function getCardNode() {
     // const root = document.querySelector('wh-card')?.shadowRoot
     const root = document.querySelector('l3t')
     return root?.querySelector('#l3t-card') as HTMLElement
+}
+
+const isCardVisible = () => {
+    return getCardNode().classList.contains('card_visible')
 }
 
 export function adjustCardPosition(el: HTMLElement) {
@@ -29,4 +34,12 @@ export function adjustCardPosition(el: HTMLElement) {
     cardNode.style.left = `${left}px`
     cardNode.style.top = `${top}px`
 
+}
+
+export function toggleCard() {
+    if (isCardVisible()) {
+        getCardNode().classList.remove('card_visible');
+    }else {
+        getCardNode().classList.add('card_visible');
+    }
 }

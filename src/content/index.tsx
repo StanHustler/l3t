@@ -1,7 +1,6 @@
 
 import {createRoot} from "react-dom/client";
 import {init} from "./highlight";
-import {mouse} from "../lib/CardPosition";
 import {L3tCard} from "../component/L3t-Card";
 
 const App = () => {
@@ -10,12 +9,11 @@ const App = () => {
         ::highlight(wh-unknown){
             color: #ff0000;
         }
-        l3t-word { color: #ff0000; }
+        .l3t-word { color: #ff0000; }
         `
     }
 
     init();
-    mouse();
 
     return (
         <>

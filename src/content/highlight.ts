@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import {ContextMap, invalidTags, WordInfoMap, WordMap} from "../constant";
+import {adjustCardPosition, toggleCard} from "../component/L3t-Card";
 
 
 
@@ -8,6 +9,7 @@ let fullDict: WordInfoMap = {}
 let dict: WordInfoMap = {}
 let contexts: ContextMap = {}
 
+export let wordNodes = document.querySelectorAll('l3t-word')
 
 function highlight(node: Node, word?: string) {
 
@@ -51,7 +53,7 @@ function highlightTextNode(node: CharacterData, dict: WordInfoMap, wordsKnown: W
     for (const segment of segments) {
         const w = segment.segment.toLowerCase()
         if (segment.isWordLike && w in dict) {
-            console.log("-- " + w)
+            // console.log("-- " + w)
             const originFormWord = getOriginForm(w)
             if (!(originFormWord in wordsKnown)) {
                 if (word && word !== originFormWord) continue
@@ -81,7 +83,17 @@ function highlightTextNode(node: CharacterData, dict: WordInfoMap, wordsKnown: W
                 //     }
                 // }
 
-                range.surroundContents(document.createElement('l3t-word'))
+                let wordNode = document.createElement('span');
+                wordNode.className = 'l3t-word';
+                range.surroundContents(wordNode);
+                wordNode.addEventListener('mouseenter', (e) => {
+                    adjustCardPosition(e.target as HTMLElement)
+                    toggleCard();
+                });
+                wordNode.addEventListener('mouseleave', (e) => {
+                    toggleCard();
+                })
+
 
                 const trans = fullDict[originFormWord]?.t
                 // avoid duplicated
@@ -134,6 +146,8 @@ export function getWordContexts(word: string) {
 //
 // }
 
+
+
 export function init() {
 
     browser.storage.local.get('dict').then((result) => {
@@ -141,6 +155,5 @@ export function init() {
         dict = fullDict
         highlight(document.body)
     })
-
 
 }

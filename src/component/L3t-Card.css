@@ -1,0 +1,17 @@
+#l3t-card {
+    width: 260px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.card_visible {
+    opacity: 1 !important;
+    transition: opacity 0.5s;
+}
+
+.l3t-word:hover {
+    cursor: pointer;
+    background-color: yellow;
+}

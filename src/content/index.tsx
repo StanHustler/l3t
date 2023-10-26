@@ -1,5 +1,8 @@
-import {Card} from "./Card";
+
 import {createRoot} from "react-dom/client";
+import {init} from "./highlight";
+import {mouse} from "../lib/CardPosition";
+import {L3tCard} from "../component/L3t-Card";
 
 const App = () => {
     function genMarkStyle() {
@@ -11,9 +14,12 @@ const App = () => {
         `
     }
 
+    init();
+    mouse();
+
     return (
         <>
-            <Card />
+            <L3tCard/>
             <style>
                 {`
           ${genMarkStyle()}
@@ -23,6 +29,6 @@ const App = () => {
     )
 }
 
-const root = document.createElement('wh-root')
+const root = document.createElement('l3t')
 document.body.appendChild(root)
 createRoot(root).render(<App />)

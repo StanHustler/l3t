@@ -2,6 +2,7 @@
 import {createRoot} from "react-dom/client";
 import {init} from "./highlight";
 import {L3tCard} from "../component/L3t-Card";
+import browser from "webextension-polyfill";
 
 const App = () => {
     function genMarkStyle() {
@@ -15,9 +16,12 @@ const App = () => {
 
     init();
 
+
+
     return (
         <>
             <L3tCard/>
+            <iframe src= {browser.runtime.getURL('src/popup.html')} />
             <style>
                 {`
           ${genMarkStyle()}

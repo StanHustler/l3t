@@ -1,7 +1,7 @@
 
 import {createRoot} from "react-dom/client";
 import {init} from "./highlight";
-import {L3tCard} from "../component/L3t-Card";
+import {L3tCard} from "../pages/card/L3t-Card";
 import browser from "webextension-polyfill";
 
 const App = () => {
@@ -9,19 +9,19 @@ const App = () => {
         return `
         ::highlight(wh-unknown){
             color: #ff0000;
+        }        
+        ::highlight(wh-context){
+            color: #16982b;
         }
-        .l3t-word { color: #ff0000; }
         `
     }
 
     init();
 
 
-
     return (
         <>
             <L3tCard/>
-            <iframe src= {browser.runtime.getURL('src/popup.html')} />
             <style>
                 {`
           ${genMarkStyle()}

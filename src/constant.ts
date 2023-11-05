@@ -56,3 +56,26 @@ export const invalidTags = [
     'OBJECT',
     'WH-ROOT'
 ]
+
+declare global {
+    interface Highlight extends Set<Range> {
+        readonly priority: number
+    }
+
+    const Highlight: {
+        prototype: Highlight
+        new (...initialRanges: Array<Range>): Highlight
+    }
+
+    type HighlightRegistry = Map<string, Highlight>
+
+    namespace CSS {
+        const highlights: HighlightRegistry
+    }
+}
+
+export type Word = {
+    status : number,
+    update_time : number,
+}
+export type Words = Record<string, Word>

@@ -1,5 +1,6 @@
 import {Card} from "antd";
 import "./L3t-Card.css"
+import {getRangeAtPoint} from "../../content/highlight";
 
 export function L3tCard () {
     return (
@@ -19,10 +20,10 @@ const isCardVisible = () => {
     return getCardNode().classList.contains('card_visible')
 }
 
-export function adjustCardPosition(el: HTMLElement) {
+export function adjustCardPosition(r: Range) {
     const cardNode = getCardNode();
 
-    const {x: x, y: y, width: m_width, height: m_height} = el.getBoundingClientRect();
+    const {x: x, y: y, width: m_width, height: m_height} = r.getBoundingClientRect();
     const { x: c_x, y: c_y, width: c_width, height: c_height } = cardNode.getBoundingClientRect();
 
     const scrollLeft = document.documentElement.scrollLeft;
@@ -36,10 +37,19 @@ export function adjustCardPosition(el: HTMLElement) {
 
 }
 
-export function toggleCard() {
-    if (isCardVisible()) {
-        getCardNode().classList.remove('card_visible');
-    }else {
+function openCard() {
+
+    if (!isCardVisible()) {
         getCardNode().classList.add('card_visible');
+        console.log("added")
+}}
+
+document.addEventListener('mousemove', (e) => {
+    const range = getRangeAtPoint(e)
+    if (range) {
+
+        openCard()
+        adjustCardPosition(range)
     }
-}
+
+})

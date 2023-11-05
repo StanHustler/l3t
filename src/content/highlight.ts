@@ -1,17 +1,23 @@
 import browser from 'webextension-polyfill';
-import {ContextMap, invalidTags, WordInfoMap, WordMap} from "../constant";
-import {adjustCardPosition, toggleCard} from "../component/L3t-Card";
+import {invalidTags, Words} from "../constant";
 
+let words : Words = {
+    "amazing": {
+        "status": 0,
+        "update_time": 1699107431,
+    },
+    "build": {
+        "status": 1 ,
+        "update_time": 1699107431,
+    },
+}
 
+export const unknownHL = new Highlight()
+export const contextHL = new Highlight()
+CSS.highlights.set('wh-unknown', unknownHL)
+CSS.highlights.set('wh-context', contextHL)
 
-let wordsKnown: WordMap = {}
-let fullDict: WordInfoMap = {}
-let dict: WordInfoMap = {}
-let contexts: ContextMap = {}
-
-export let wordNodes = document.querySelectorAll('l3t-word')
-
-function highlight(node: Node, word?: string) {
+function highlight(node: Node) {
 
     function getTextNodes(node: Node): Text[] {
         const textNodes = []
@@ -32,15 +38,13 @@ function highlight(node: Node, word?: string) {
 
     const textNodes = getTextNodes(node)
     for (const node of textNodes) {
-        highlightTextNode(node, dict, wordsKnown, word)
+        highlightTextNode(node)
     }
 }
 
-export function getOriginForm(word: string) {
-    return fullDict[word]?.o ?? word
-}
 
-function highlightTextNode(node: CharacterData, dict: WordInfoMap, wordsKnown: WordMap, word?: string) {
+function highlightTextNode(node: CharacterData) {
+
     const text = node.nodeValue || ''
     let toHighlightWords = []
     const segmenterEn = new Intl.Segmenter('en-US', { granularity: 'word' })
@@ -52,108 +56,50 @@ function highlightTextNode(node: CharacterData, dict: WordInfoMap, wordsKnown: W
 
     for (const segment of segments) {
         const w = segment.segment.toLowerCase()
-        if (segment.isWordLike && w in dict) {
-            // console.log("-- " + w)
-            const originFormWord = getOriginForm(w)
-            if (!(originFormWord in wordsKnown)) {
-                if (word && word !== originFormWord) continue
-                const range = new Range()
-                range.setStart(curNode, segment.index - preEnd)
-                range.setEnd(curNode, segment.index - preEnd + w.length)
+        if (segment.isWordLike && (w in words)) {
 
-                // const trans = settings().showCnTrans && fullDict[originFormWord]?.t
-                // if (trans) {
-                //     // avoid duplicated
-                //     if (range.endContainer.nextSibling?.nodeName === 'W-MARK-T') {
-                //         continue
-                //     }
-                //     // insert trans tag after range
-                //     const newRange = range.cloneRange()
-                //     newRange.collapse(false)
-                //     const transNode = document.createElement('w-mark-t')
-                //     transNode.textContent = `(${cnRegex.exec(trans)?.[0]})`
-                //     transNode.dataset.trans = `(${trans})`
-                //     // TODO: insertNode performance is terrible, need to optimize
-                //     newRange.insertNode(transNode)
-                //     newRange.detach()
-                //     // if transNode is not the last node, move cursor to next text node
-                //     preEnd = segment.index + w.length
-                //     if (preEnd < totalLength) {
-                //         curNode = transNode.nextSibling as Text
-                //     }
-                // }
+            const range = new Range()
+            range.setStart(curNode, segment.index - preEnd)
+            range.setEnd(curNode, segment.index - preEnd + w.length)
 
-                let wordNode = document.createElement('span');
-                wordNode.className = 'l3t-word';
-                range.surroundContents(wordNode);
-                wordNode.addEventListener('mouseenter', (e) => {
-                    adjustCardPosition(e.target as HTMLElement)
-                    toggleCard();
-                });
-                wordNode.addEventListener('mouseleave', (e) => {
-                    toggleCard();
-                })
-
-
-                const trans = fullDict[originFormWord]?.t
-                // avoid duplicated
-                if (range.endContainer.nextSibling?.nodeName === 'W-MARK-T') {
-                    continue
-                }
-                // insert trans tag after range
-                const newRange = range.cloneRange()
-                newRange.collapse(false)
-                const transNode = document.createElement('w-mark-t')
-                const cnRegex = /[\u4E00-\u9FA5]+/
-                transNode.textContent = `(${cnRegex.exec(trans)?.[0]})`
-                transNode.dataset.trans = `(${trans})`
-                // TODO: insertNode performance is terrible, need to optimize
-                newRange.insertNode(transNode)
-                newRange.detach()
-                // if transNode is not the last node, move cursor to next text node
-                preEnd = segment.index + w.length
-                if (preEnd < totalLength) {
-                    curNode = transNode.nextSibling as Text
-                }
-
-                // const contextLength = getWordContexts(w)?.length ?? 0
-                // if (contextLength > 0) {
-                //     contextHL.add(range)
-                // } else {
-                //     unknownHL.add(range)
-                // }
-                //
-                // toHighlightWords.push(w)
+            if (words[w].status === 0) {
+                contextHL.add(range)
+            } else {
+                unknownHL.add(range)
             }
+
         }
     }
 
-    // if (toHighlightWords.length > 0) {
-    //     autoPauseForYoutubeSubTitle(node.parentElement, toHighlightWords)
-    // }
 }
 
-export function getWordContexts(word: string) {
-    const originFormWord = getOriginForm(word)
-    return contexts[originFormWord] ?? []
+let lastMouseOverElement: Element | null = null;
+let rangesWithRectAtMouseOverCache: { range: Range; rect: DOMRect }[] = []
+export function getRangeAtPoint(e: MouseEvent) {
+    const element = e.target as HTMLElement
+    if (element !== lastMouseOverElement) {
+        lastMouseOverElement = element
+        rangesWithRectAtMouseOverCache = [...unknownHL, ...contextHL]
+            .map(range => {
+                if (element === range.commonAncestorContainer?.parentElement) {
+                    const rect = range.getBoundingClientRect()
+                    return { range, rect }
+                }
+                return null
+            })
+            .filter(r => r !== null) as { range: Range; rect: DOMRect }[]
+    }
+
+    const rangeAtPoint = rangesWithRectAtMouseOverCache.find(
+        ({ rect }) =>
+            rect && rect.left <= e.clientX && rect.right >= e.clientX && rect.top <= e.clientY && rect.bottom >= e.clientY
+    )
+    return rangeAtPoint?.range ?? null
 }
-
-// async function readStorageAndHighlight() {
-//     const result = await chrome.storage.local.get(['dict', StorageKey.context])
-//     fullDict = result.dict || (await waitForDictPrepare())
-//     dict = await getSelectedDicts(fullDict)
-//
-//
-// }
-
 
 
 export function init() {
 
-    browser.storage.local.get('dict').then((result) => {
-        fullDict = result.dict
-        dict = fullDict
-        highlight(document.body)
-    })
+    highlight(document.body)
 
 }

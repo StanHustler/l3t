@@ -44,12 +44,38 @@ function openCard() {
         console.log("added")
 }}
 
+
+let timerHideRef: number
+let timerShowRef: number
+
+function clearTimerHideRef() {
+    timerHideRef && clearTimeout(timerHideRef)
+}
+
+function hidePopupDelay(ms: number) {
+    clearTimerHideRef()
+    timerHideRef = window.setTimeout(() => {
+        const cardNode = getCardNode()
+        cardNode.classList.remove('card_visible')
+        cardNode.inert = true
+        // setDictHistory([])
+    }, ms)
+}
+
 document.addEventListener('mousemove', (e) => {
     const range = getRangeAtPoint(e)
     if (range) {
 
-        openCard()
+
         adjustCardPosition(range)
+
+        clearTimerHideRef()
+        timerShowRef = window.setTimeout(() => {
+            openCard()
+        }, 200)
+    } else {
+        timerShowRef && clearTimeout(timerShowRef)
+        isCardVisible() && hidePopupDelay(500)
     }
 
 })

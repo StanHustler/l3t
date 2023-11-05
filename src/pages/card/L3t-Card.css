@@ -9,7 +9,7 @@
 
 .card_visible {
     opacity: 1 !important;
-    transition: opacity 0.5s;
+
 }
 
 .l3t-word:hover {

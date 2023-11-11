@@ -32,7 +32,7 @@ export function L3tCard () {
 
     })
 
-    lookup().then(r => console.log(r))
+    lookup("test").then(r => console.log(r))
     return (
         <Card id="l3t-card">
             <p>{curWord}</p>

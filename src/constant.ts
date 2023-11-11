@@ -79,3 +79,9 @@ export type Word = {
     update_time : number,
 }
 export type Words = Record<string, Word>
+
+
+export const enum Messages {
+    SetKnown,
+    FetchHtml = 'fetch_html',
+}

@@ -1,13 +1,44 @@
 import {Card} from "antd";
 import "./L3t-Card.css"
 import {getRangeAtPoint} from "../../content/highlight";
+import {useState} from "react";
+import {lookup} from "../../lib/YoudaoDict";
+
+
+
 
 export function L3tCard () {
+    const [curWord, setCurWord] = useState("")
+
+    let rangeCache: Range | null = null
+    document.addEventListener('mousemove', (e) => {
+        const range = getRangeAtPoint(e)
+        if (range) {
+
+            if (rangeCache != range) {
+                rangeCache = range
+                adjustCardPosition(range)
+                setCurWord(range.toString())
+            }
+
+            clearTimerHideRef()
+            timerShowRef = window.setTimeout(() => {
+                openCard()
+            }, 200)
+        } else {
+            timerShowRef && clearTimeout(timerShowRef)
+            isCardVisible() && hidePopupDelay(500)
+        }
+
+    })
+
+    lookup().then(r => console.log(r))
     return (
-        <Card id="l3t-card" title="aa" >
-            <p>this is a word</p>
+        <Card id="l3t-card">
+            <p>{curWord}</p>
         </Card>
     )
+
 }
 
 function getCardNode() {
@@ -20,7 +51,7 @@ const isCardVisible = () => {
     return getCardNode().classList.contains('card_visible')
 }
 
-export function adjustCardPosition(r: Range) {
+function adjustCardPosition(r: Range) {
     const cardNode = getCardNode();
 
     const {x: x, y: y, width: m_width, height: m_height} = r.getBoundingClientRect();
@@ -38,10 +69,9 @@ export function adjustCardPosition(r: Range) {
 }
 
 function openCard() {
-
     if (!isCardVisible()) {
         getCardNode().classList.add('card_visible');
-        console.log("added")
+        // console.log("added")
 }}
 
 
@@ -62,20 +92,5 @@ function hidePopupDelay(ms: number) {
     }, ms)
 }
 
-document.addEventListener('mousemove', (e) => {
-    const range = getRangeAtPoint(e)
-    if (range) {
 
 
-        adjustCardPosition(range)
-
-        clearTimerHideRef()
-        timerShowRef = window.setTimeout(() => {
-            openCard()
-        }, 200)
-    } else {
-        timerShowRef && clearTimeout(timerShowRef)
-        isCardVisible() && hidePopupDelay(500)
-    }
-
-})

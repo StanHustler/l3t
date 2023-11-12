@@ -1,14 +1,17 @@
 import {Card} from "antd";
 import "./L3t-Card.css"
 import {getRangeAtPoint} from "../../content/highlight";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {lookup} from "../../lib/YoudaoDict";
+import Meta from "antd/es/card/Meta";
 
 
 
 
 export function L3tCard () {
     const [curWord, setCurWord] = useState("")
+    const [exp, setExp] = useState("")
+    const [tag, setTag] = useState("")
 
     let rangeCache: Range | null = null
     document.addEventListener('mousemove', (e) => {
@@ -18,7 +21,7 @@ export function L3tCard () {
             if (rangeCache != range) {
                 rangeCache = range
                 adjustCardPosition(range)
-                setCurWord(range.toString())
+                setCurWord(range.toString().toLowerCase())
             }
 
             clearTimerHideRef()
@@ -32,10 +35,19 @@ export function L3tCard () {
 
     })
 
-    lookup("test").then(r => console.log(r))
+
+    useEffect(() => {
+
+        lookup(curWord).then((res) => {
+            setExp(res.exp)
+            setTag(res.tag)
+        })
+    })
+
     return (
-        <Card id="l3t-card">
-            <p>{curWord}</p>
+        <Card id="l3t-card" size={"small"} loading={exp===""}>
+            <Meta title={curWord} description={exp}/>
+            <Meta description={tag}/>
         </Card>
     )
 

@@ -21,15 +21,12 @@ export function getMessagePort() {
 
 
 export async function sendMessage(action: Messages, data: object): Promise<any> {
-    console.log("sendMessage "+action)
     const port = getMessagePort()
     const uuid = uuidv4()
 
     return new Promise((resolve, _reject) => {
         const messageHandler = (msg: any) => {
-            console.log(uuid + " " + msg.uuid)
             if (msg.uuid === uuid) {
-                console.log("sendMessagepromise"+action)
                 resolve(msg.result)
                 port.onMessage.removeListener(messageHandler)
             }

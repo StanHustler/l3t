@@ -5,7 +5,7 @@ import {lookup} from "../../lib/YoudaoDict";
 import root from 'react-shadow';
 
 import styles from "../../css/RelingoCard.css"
-
+import { L3tIcon } from "../../lib/L3t-Icon";
 
 export function L3tCard () {
     const [curWord, setCurWord] = useState("22")
@@ -44,9 +44,31 @@ export function L3tCard () {
     })
 
     return (
-        <root.div id="shadow-root">
+        <root.div id="shadow-root" >
             <div className="l3t-card">
-                <div className="l3t-card__word">{curWord}</div>
+                <div className="l3t-card-header">
+                    <h3> {curWord} </h3>
+                    <div className="btn-action">
+                        <div className="btn-star">
+                            <L3tIcon.heart className="card-icon" />
+                        </div>
+                        <div className="btn-star">
+                            <L3tIcon.check_double className="card-icon" />
+                        </div>
+                    </div>
+                </div>
+                <div className="l3t-card-exp">{exp}</div>
+                <div className="l3t-card-footer">
+                    <div className="card-slot">
+                        <L3tIcon.list_check_2 className="card-icon" />
+                        More
+                    </div>
+                    <div className="card-slot">
+                        <L3tIcon.bookmark className="card-icon" />
+                        Like
+                    </div>
+                </div>
+
             </div>
             <style type={"text/css"}> {styles} </style>
         </root.div>

@@ -2,6 +2,7 @@
 import {createRoot} from "react-dom/client";
 import {init} from "./highlight";
 import {L3tCard} from "../pages/card/L3t-Card";
+
 import browser from "webextension-polyfill";
 
 const App = () => {

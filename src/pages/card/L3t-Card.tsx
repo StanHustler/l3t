@@ -1,17 +1,16 @@
-import {Card} from "antd";
 import "./L3t-Card.css"
 import {getRangeAtPoint} from "../../content/highlight";
 import {useEffect, useState} from "react";
 import {lookup} from "../../lib/YoudaoDict";
-import Meta from "antd/es/card/Meta";
+import root from 'react-shadow';
 
-
+import styles from "../../css/RelingoCard.css"
 
 
 export function L3tCard () {
-    const [curWord, setCurWord] = useState("")
-    const [exp, setExp] = useState("")
-    const [tag, setTag] = useState("")
+    const [curWord, setCurWord] = useState("22")
+    const [exp, setExp] = useState("22")
+    const [tag, setTag] = useState("22")
 
     let rangeCache: Range | null = null
     document.addEventListener('mousemove', (e) => {
@@ -38,25 +37,27 @@ export function L3tCard () {
 
     useEffect(() => {
 
-        lookup(curWord).then((res) => {
-            setExp(res.exp)
-            setTag(res.tag)
-        })
+        // lookup(curWord).then((res) => {
+        //     setExp(res.exp)
+        //     setTag(res.tag)
+        // })
     })
 
     return (
-        <Card id="l3t-card" size={"small"} loading={exp===""}>
-            <Meta title={curWord} description={exp}/>
-            <Meta description={tag}/>
-        </Card>
+        <root.div id="shadow-root">
+            <div className="l3t-card">
+                <div className="l3t-card__word">{curWord}</div>
+            </div>
+            <style type={"text/css"}> {styles} </style>
+        </root.div>
     )
 
 }
 
 function getCardNode() {
     // const root = document.querySelector('wh-card')?.shadowRoot
-    const root = document.querySelector('l3t')
-    return root?.querySelector('#l3t-card') as HTMLElement
+    const root = document.querySelector('#shadow-root')?.shadowRoot
+    return root?.querySelector('div') as HTMLElement
 }
 
 const isCardVisible = () => {
